@@ -11,6 +11,7 @@ export class Game extends Scene {
     this.load.image("star", "assets/burger.png");
     this.load.image("bomb", "assets/bomb.png");
     this.load.image("bin", "assets/bin.png");
+    this.load.image("whiteboard", "assets/whiteboard.png");
     this.load.image("moldyBurger", "assets/moldyBurger.png");
     this.load.spritesheet("dude", "assets/finn2.png", {
       frameWidth: 64,
@@ -22,9 +23,9 @@ export class Game extends Scene {
     star.disableBody(true, true);
     this.score += 10.0;
     if (this.score < 0) {
-      this.scoreText.setText("Loss: €" + this.score.toFixed(2));
+      this.scoreText.setText("Today's Loss:\n€" + this.score.toFixed(2));
     } else {
-      this.scoreText.setText("Profit: €" + this.score.toFixed(2));
+      this.scoreText.setText("Today's Profit:\n€" + this.score.toFixed(2));
     }
     if (this.score >= this.nextBinThreshold) {
       this.spawnBin(1);
@@ -39,9 +40,9 @@ export class Game extends Scene {
     star.disableBody(true, true);
     this.score -= 15.0;
     if (this.score < 0) {
-      this.scoreText.setText("Loss: €" + this.score.toFixed(2));
+      this.scoreText.setText("Today's Loss:\n€" + this.score.toFixed(2));
     } else {
-      this.scoreText.setText("Profit: €" + this.score.toFixed(2));
+      this.scoreText.setText("Today's Profit:\n€" + this.score.toFixed(2));
     }
     const binX = Phaser.Math.Between(50, 750);
     const binY = 520;
@@ -128,6 +129,17 @@ export class Game extends Scene {
 
     const bg = this.add.image(0, 0, "sky").setOrigin(0, 0);
     bg.setDisplaySize(800, 600);
+
+    this.whiteboard = this.add.image(50, 50, "whiteboard").setOrigin(0, 0);
+    this.whiteboard.setScale(0.8)
+    this.scoreText = this.add.text(110, 80, "Today's Profit:\n€0.00", {
+      fontFamily: "Permanent Marker",
+      fontSize: "28px",
+      fill: "#000",
+        align: "center",
+        lineSpacing: 10,
+        
+    }).setOrigin(0,0);
 
     // Declare platforms as a property of the scene
     this.platforms = this.physics.add.staticGroup();
@@ -228,11 +240,7 @@ export class Game extends Scene {
 
     this.physics.add.overlap(this.bins, this.stars, this.binStar, null, this);
 
-    this.scoreText = this.add.text(16, 16, "Profit: €0.00", {
-      fontFamily: "Pistilli",
-      fontSize: "32px",
-      fill: "#000",
-    });
+    
 
     this.nextBinThreshold = 100;
   }
