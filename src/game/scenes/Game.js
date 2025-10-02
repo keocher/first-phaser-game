@@ -7,12 +7,12 @@ export class Game extends Scene {
 
   preload() {
     this.load.image("sky", "assets/kitchen.png");
-    this.load.image("ground", "assets/platform.png");
-    this.load.image("star", "assets/star.png");
+    this.load.image("ground", "assets/floor.png");
+    this.load.image("star", "assets/burger.png");
     this.load.image("bomb", "assets/bomb.png");
-    this.load.spritesheet("dude", "assets/finn.png", {
-      frameWidth: 32,
-      frameHeight: 32,
+    this.load.spritesheet("dude", "assets/finn2.png", {
+      frameWidth: 64,
+      frameHeight: 91,
     });
   }
 
@@ -54,15 +54,11 @@ export class Game extends Scene {
     // Declare platforms as a property of the scene
     this.platforms = this.physics.add.staticGroup();
 
-    this.platforms.create(400, 568, "ground").setScale(2).refreshBody();
-    this.platforms.create(600, 400, "ground");
-    this.platforms.create(50, 250, "ground");
-    this.platforms.create(750, 220, "ground");
+    this.platforms.create(400, 568, "ground").refreshBody();
 
     this.player = this.physics.add.sprite(100, 450, "dude");
-    this.player.setScale(1.8);
-    this.player.body.setSize(32, 32);
-    this.player.body.setOffset(0, 0);
+    this.player.setScale(0.8).refreshBody();
+
     this.physics.add.collider(this.player, this.platforms);
     this.player.setBounce(0.2);
     this.player.setCollideWorldBounds(true);
@@ -117,6 +113,7 @@ export class Game extends Scene {
       this
     );
     this.scoreText = this.add.text(16, 16, "Score: 0", {
+      fontFamily: "Pistilli",
       fontSize: "32px",
       fill: "#000",
     });
