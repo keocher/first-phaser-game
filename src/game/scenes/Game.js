@@ -6,13 +6,13 @@ export class Game extends Scene {
   }
 
   preload() {
-    this.load.image("sky", "assets/sky.png");
+    this.load.image("sky", "assets/kitchen.png");
     this.load.image("ground", "assets/platform.png");
     this.load.image("star", "assets/star.png");
     this.load.image("bomb", "assets/bomb.png");
-    this.load.spritesheet("dude", "assets/dude.png", {
+    this.load.spritesheet("dude", "assets/finn.png", {
       frameWidth: 32,
-      frameHeight: 48,
+      frameHeight: 32,
     });
   }
 
@@ -46,7 +46,10 @@ export class Game extends Scene {
   create() {
     this.score = 0;
 
-    this.add.image(400, 300, "sky");
+    const bg = this.add.image(0, 0, "sky").setOrigin(0, 0);
+  bg.setDisplaySize(800, 600);
+    
+    
 
     // Declare platforms as a property of the scene
     this.platforms = this.physics.add.staticGroup();
@@ -57,14 +60,16 @@ export class Game extends Scene {
     this.platforms.create(750, 220, "ground");
 
     this.player = this.physics.add.sprite(100, 450, "dude");
-
+    this.player.setScale(1.8);
+    this.player.body.setSize(32, 32);
+    this.player.body.setOffset(0, 0);
     this.physics.add.collider(this.player, this.platforms);
     this.player.setBounce(0.2);
     this.player.setCollideWorldBounds(true);
 
     this.anims.create({
       key: "left",
-      frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
+      frames: this.anims.generateFrameNumbers("dude", { start: 5, end: 8 }),
       frameRate: 10,
       repeat: -1,
     });
@@ -77,7 +82,7 @@ export class Game extends Scene {
 
     this.anims.create({
       key: "right",
-      frames: this.anims.generateFrameNumbers("dude", { start: 5, end: 8 }),
+      frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
       frameRate: 10,
       repeat: -1,
     });
