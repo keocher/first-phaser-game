@@ -21,12 +21,21 @@ export class Game extends Scene {
     star.disableBody(true, true);
     this.score += 10;
     this.scoreText.setText("Score: " + this.score);
-
-    if (this.stars.countActive(true) === 0) {
-      this.stars.children.iterate(function (child) {
-        child.enableBody(true, child.x, 0, true, true);
-      });
+    if (this.score >= this.nextBinThreshold) {
+       this.spawnBin(1);
+       this.nextBinThreshold += 100;
     }
+  }
+
+  binStar(bin, star) {
+    star.disableBody(true, true);
+    this.score -= 20;
+    this.scoreText.setText("Score: " + this.score);
+    const binX = Phaser.Math.Between(50, 750);
+    const binY = 520;
+
+    bin.setPosition(binX, binY);
+    bin.refreshBody();
     
   }
 
@@ -36,6 +45,45 @@ export class Game extends Scene {
     player.anims.play("turn");
     this.gameOver = true;
   }
+
+  bounceStar(star, platform) {
+    // Add a slight random horizontal velocity on bounce
+  
+    star.setGravityY(Phaser.Math.Between(-100, 200));
+  }
+
+  spawnStar() {
+    const activeStars = this.stars.countActive(true);
+    if (activeStars >= this.stars.maxSize) {
+      return;
+    }
+
+    const spawnX = Phaser.Math.Between(40, 760);
+    const star = this.stars.get(spawnX, 0, "star");
+
+    if (!star) {
+      return;
+    }
+
+    star.setActive(true);
+    star.setVisible(true);
+    star.body.enable = true;
+    star.body.reset(spawnX, 0);
+    star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    star.setGravityY(0);
+    star.setVelocity(0, 0);
+  }
+
+  spawnBin(count) {
+    for (let i = 0; i < count; i += 1) {
+        const x = Phaser.Math.Between(50, 750);
+        const bin = this.bins.create(x, 520, "bin");
+        bin.refreshBody();
+    }
+}
+
+  
+  
 
   create() {
     this.score = 0;
@@ -58,7 +106,10 @@ export class Game extends Scene {
     //bin
     const binX = Phaser.Math.Between(50, 750);
     const binY = 520;
-    this.bin = this.physics.add.staticImage(binX, binY, "bin");
+    this.binMultiplier =1;
+    this.bins = this.physics.add.staticGroup();
+    this.spawnBin(this.binMultiplier);
+
     //movement
     this.anims.create({
       key: "left",
@@ -83,17 +134,23 @@ export class Game extends Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     this.stars = this.physics.add.group({
-      key: "star",
-      repeat: 11,
-      setXY: { x: 12, y: 0, stepX: 70 },
+      classType: Phaser.Physics.Arcade.Image,
+      maxSize: 12,
     });
 
+    for (let i = 0; i < 4; i += 1) {
+      this.spawnStar();
+    }
 
-    //burgers
-    this.stars.children.iterate(function (child) {
-      child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    this.time.addEvent({
+      delay: 800,
+      callback: this.spawnStar,
+      callbackScope: this,
+      loop: true,
     });
-    this.physics.add.collider(this.stars, this.platforms);
+
+    this.physics.add.collider(this.stars, this.platforms, this.bounceStar, null, this);
+   
     this.physics.add.overlap(
       this.player,
       this.stars,
@@ -102,12 +159,28 @@ export class Game extends Scene {
       this
     );
 
+    this.physics.add.overlap(
+      this.bins,
+      this.stars,
+      this.binStar,
+      null,
+      this
+    );
+
+   
     
     this.scoreText = this.add.text(16, 16, "Score: 0", {
       fontFamily: "Pistilli",
       fontSize: "32px",
       fill: "#000",
     });
+
+
+     this.nextBinThreshold = 100;
+     
+
+
+
   }
 
   update() {
