@@ -11,6 +11,7 @@ export class Game extends Scene {
     this.load.image("star", "assets/burger.png");
     this.load.image("bomb", "assets/bomb.png");
     this.load.image("bin", "assets/bin.png");
+    this.load.image("moldyBurger", "assets/moldyBurger.png");
     this.load.spritesheet("dude", "assets/finn2.png", {
       frameWidth: 64,
       frameHeight: 91,
@@ -19,36 +20,41 @@ export class Game extends Scene {
 
   collectStar(player, star) {
     star.disableBody(true, true);
-    this.score += 10;
-    this.scoreText.setText("Score: " + this.score);
-    if (this.score >= this.nextBinThreshold) {
-       this.spawnBin(1);
-       this.nextBinThreshold += 100;
+    this.score += 10.0;
+    if (this.score < 0) {
+      this.scoreText.setText("Loss: €" + this.score.toFixed(2));
+    } else {
+      this.scoreText.setText("Profit: €" + this.score.toFixed(2));
     }
+    if (this.score >= this.nextBinThreshold) {
+      this.spawnBin(1);
+      this.nextBinThreshold += 100;
+    }
+    if(this.score >= 50){
+      this.spawnMoldyBurger();
+}
   }
 
   binStar(bin, star) {
     star.disableBody(true, true);
-    this.score -= 20;
-    this.scoreText.setText("Score: " + this.score);
+    this.score -= 15.0;
+    if (this.score < 0) {
+      this.scoreText.setText("Loss: €" + this.score.toFixed(2));
+    } else {
+      this.scoreText.setText("Profit: €" + this.score.toFixed(2));
+    }
     const binX = Phaser.Math.Between(50, 750);
     const binY = 520;
 
     bin.setPosition(binX, binY);
     bin.refreshBody();
-    
   }
 
-  hitBomb(player, bomb) {
-    this.physics.pause();
-    player.setTint(0xff0000);
-    player.anims.play("turn");
-    this.gameOver = true;
-  }
+  
 
   bounceStar(star, platform) {
     // Add a slight random horizontal velocity on bounce
-  
+
     star.setGravityY(Phaser.Math.Between(-100, 200));
   }
 
@@ -76,17 +82,49 @@ export class Game extends Scene {
 
   spawnBin(count) {
     for (let i = 0; i < count; i += 1) {
-        const x = Phaser.Math.Between(50, 750);
-        const bin = this.bins.create(x, 520, "bin");
-        bin.refreshBody();
+      const x = Phaser.Math.Between(50, 750);
+      const bin = this.bins.create(x, 520, "bin");
+      bin.refreshBody();
     }
-}
+  }
 
-  
-  
+  avoidMold(moldyBurger, platform) {
+    moldyBurger.disableBody(true, true);
+  }
+
+  hitMold(player, moldyBurger) {
+     this.physics.pause();
+    player.setTint(0xff0000);
+    player.anims.play("turn");
+    this.gameOver = true;
+  }
+
+  spawnMoldyBurger() {
+    const activeMold = this.moldyBurgers.countActive(true);
+    if (activeMold >= this.moldyBurgers.maxSize) {
+      return;
+    }
+
+    const spawnX = Phaser.Math.Between(40, 760);
+    const moldyBurger = this.moldyBurgers.get(spawnX, 0, "moldyBurger");
+
+    if (!this.moldyBurgers) {
+      return;
+    }
+
+    moldyBurger.setActive(true);
+    moldyBurger.setVisible(true);
+    moldyBurger.body.enable = true;
+    moldyBurger.body.reset(spawnX, 0);
+    moldyBurger.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    moldyBurger.setGravityY(0);
+    moldyBurger.setVelocity(0, 0);
+
+}
+    
 
   create() {
-    this.score = 0;
+    this.score = 0.0;
 
     const bg = this.add.image(0, 0, "sky").setOrigin(0, 0);
     bg.setDisplaySize(800, 600);
@@ -106,7 +144,7 @@ export class Game extends Scene {
     //bin
     const binX = Phaser.Math.Between(50, 750);
     const binY = 520;
-    this.binMultiplier =1;
+    this.binMultiplier = 1;
     this.bins = this.physics.add.staticGroup();
     this.spawnBin(this.binMultiplier);
 
@@ -142,6 +180,29 @@ export class Game extends Scene {
       this.spawnStar();
     }
 
+    //moldyBurger
+    this.moldyBurgers = this.physics.add.group({
+      classType: Phaser.Physics.Arcade.Image,
+      maxSize: 2,
+    });
+
+    
+    
+
+    this.physics.add.collider(
+      this.moldyBurgers,
+      this.platforms,
+      this.avoidMold,
+      null,
+      this
+    );
+    this.physics.add.overlap(
+      this.player,
+      this.moldyBurgers,
+      this.hitMold,
+      null,
+      this
+    );
     this.time.addEvent({
       delay: 800,
       callback: this.spawnStar,
@@ -149,8 +210,14 @@ export class Game extends Scene {
       loop: true,
     });
 
-    this.physics.add.collider(this.stars, this.platforms, this.bounceStar, null, this);
-   
+    this.physics.add.collider(
+      this.stars,
+      this.platforms,
+      this.bounceStar,
+      null,
+      this
+    );
+
     this.physics.add.overlap(
       this.player,
       this.stars,
@@ -159,28 +226,15 @@ export class Game extends Scene {
       this
     );
 
-    this.physics.add.overlap(
-      this.bins,
-      this.stars,
-      this.binStar,
-      null,
-      this
-    );
+    this.physics.add.overlap(this.bins, this.stars, this.binStar, null, this);
 
-   
-    
-    this.scoreText = this.add.text(16, 16, "Score: 0", {
+    this.scoreText = this.add.text(16, 16, "Profit: €0.00", {
       fontFamily: "Pistilli",
       fontSize: "32px",
       fill: "#000",
     });
 
-
-     this.nextBinThreshold = 100;
-     
-
-
-
+    this.nextBinThreshold = 100;
   }
 
   update() {
