@@ -31,9 +31,9 @@ export class Game extends Scene {
       this.spawnBin(1);
       this.nextBinThreshold += 100;
     }
-    if(this.score >= 50){
+    if (this.score >= 50) {
       this.spawnMoldyBurger();
-}
+    }
   }
 
   binStar(bin, star) {
@@ -50,8 +50,6 @@ export class Game extends Scene {
     bin.setPosition(binX, binY);
     bin.refreshBody();
   }
-
-  
 
   bounceStar(star, platform) {
     // Add a slight random horizontal velocity on bounce
@@ -94,7 +92,7 @@ export class Game extends Scene {
   }
 
   hitMold(player, moldyBurger) {
-     this.physics.pause();
+    this.physics.pause();
     player.setTint(0xff0000);
     player.anims.play("turn");
     this.gameOver = true;
@@ -120,9 +118,7 @@ export class Game extends Scene {
     moldyBurger.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
     moldyBurger.setGravityY(0);
     moldyBurger.setVelocity(0, 0);
-
-}
-    
+  }
 
   create() {
     this.score = 0.0;
@@ -131,15 +127,16 @@ export class Game extends Scene {
     bg.setDisplaySize(800, 600);
 
     this.whiteboard = this.add.image(50, 50, "whiteboard").setOrigin(0, 0);
-    this.whiteboard.setScale(0.8)
-    this.scoreText = this.add.text(110, 80, "Today's Profit:\n€0.00", {
-      fontFamily: "Permanent Marker",
-      fontSize: "28px",
-      fill: "#000",
+    this.whiteboard.setScale(0.8);
+    this.scoreText = this.add
+      .text(110, 80, "Today's Profit:\n€0.00", {
+        fontFamily: "Permanent Marker",
+        fontSize: "28px",
+        fill: "#000",
         align: "center",
         lineSpacing: 10,
-        
-    }).setOrigin(0,0);
+      })
+      .setOrigin(0, 0);
 
     // Declare platforms as a property of the scene
     this.platforms = this.physics.add.staticGroup();
@@ -148,6 +145,7 @@ export class Game extends Scene {
     //player
     this.player = this.physics.add.sprite(100, 450, "dude");
     this.player.setScale(0.8).refreshBody();
+    this.player.setGravityY(300);
 
     //collisions
     this.physics.add.collider(this.player, this.platforms);
@@ -198,9 +196,6 @@ export class Game extends Scene {
       maxSize: 2,
     });
 
-    
-    
-
     this.physics.add.collider(
       this.moldyBurgers,
       this.platforms,
@@ -240,24 +235,24 @@ export class Game extends Scene {
 
     this.physics.add.overlap(this.bins, this.stars, this.binStar, null, this);
 
-    
-
     this.nextBinThreshold = 100;
   }
 
   update() {
+    const speedX = 200;
+    const speedY = -330;
     if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-160);
+      this.player.setVelocityX(-speedX);
       this.player.anims.play("left", true);
     } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(160);
+      this.player.setVelocityX(speedX);
       this.player.anims.play("right", true);
     } else {
       this.player.setVelocityX(0);
       this.player.anims.play("turn");
     }
     if (this.cursors.up.isDown && this.player.body.touching.down) {
-      this.player.setVelocityY(-330);
+      this.player.setVelocityY(speedY);
     }
   }
 }
