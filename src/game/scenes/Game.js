@@ -10,6 +10,7 @@ export class Game extends Scene {
     this.load.image("ground", "assets/floor.png");
     this.load.image("star", "assets/burger.png");
     this.load.image("bomb", "assets/bomb.png");
+    this.load.image("bin", "assets/bin.png");
     this.load.spritesheet("dude", "assets/finn2.png", {
       frameWidth: 64,
       frameHeight: 91,
@@ -26,14 +27,7 @@ export class Game extends Scene {
         child.enableBody(true, child.x, 0, true, true);
       });
     }
-    const x =
-      player.x < 400
-        ? Phaser.Math.Between(400, 800)
-        : Phaser.Math.Between(0, 400);
-    const bomb = this.bombs.create(this.x, 16, "bomb");
-    bomb.setBounce(1);
-    bomb.setCollideWorldBounds(true);
-    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    
   }
 
   hitBomb(player, bomb) {
@@ -47,22 +41,25 @@ export class Game extends Scene {
     this.score = 0;
 
     const bg = this.add.image(0, 0, "sky").setOrigin(0, 0);
-  bg.setDisplaySize(800, 600);
-    
-    
+    bg.setDisplaySize(800, 600);
 
     // Declare platforms as a property of the scene
     this.platforms = this.physics.add.staticGroup();
-
     this.platforms.create(400, 568, "ground").refreshBody();
 
+    //player
     this.player = this.physics.add.sprite(100, 450, "dude");
     this.player.setScale(0.8).refreshBody();
 
+    //collisions
     this.physics.add.collider(this.player, this.platforms);
     this.player.setBounce(0.2);
     this.player.setCollideWorldBounds(true);
-
+    //bin
+    const binX = Phaser.Math.Between(50, 750);
+    const binY = 520;
+    this.bin = this.physics.add.staticImage(binX, binY, "bin");
+    //movement
     this.anims.create({
       key: "left",
       frames: this.anims.generateFrameNumbers("dude", { start: 5, end: 8 }),
@@ -91,6 +88,8 @@ export class Game extends Scene {
       setXY: { x: 12, y: 0, stepX: 70 },
     });
 
+
+    //burgers
     this.stars.children.iterate(function (child) {
       child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
     });
@@ -103,15 +102,7 @@ export class Game extends Scene {
       this
     );
 
-    this.bombs = this.physics.add.group();
-    this.physics.add.collider(this.bombs, this.platforms);
-    this.physics.add.collider(
-      this.player,
-      this.bombs,
-      this.hitBomb,
-      null,
-      this
-    );
+    
     this.scoreText = this.add.text(16, 16, "Score: 0", {
       fontFamily: "Pistilli",
       fontSize: "32px",
