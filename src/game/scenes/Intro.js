@@ -12,7 +12,7 @@ export class Intro extends Scene {
 
     create() {
         
-        const titleText = this.add.text(400, 150, "Finn's\nTakeaway", {
+        const titleText = this.add.text(400, -200, "Finn's\nTakeaway", {
             fontSize: '80px',
             fill: '#ffffff',
             fontFamily:'Pistilli',
@@ -22,7 +22,7 @@ export class Intro extends Scene {
             
         });
 
-        const gameText = this.add.text(400, 275, "THE GAME", {
+        const gameText = this.add.text(-400, 275, "THE GAME", {
             fontSize: '30px',
             fill: '#ffffffff',
             fontFamily:'Pistilli',
@@ -32,8 +32,20 @@ export class Intro extends Scene {
 
         gameText.setOrigin(0.5);
         titleText.setOrigin(0.5);
-    
-        
+
+        this.tweens.add({
+            targets: titleText,
+            y: 150,
+            duration: 1000,
+            ease: 'Sine.easeOut',
+        });
+        this.tweens.add({
+            targets: gameText,
+            x: 400,
+            duration: 500,
+            ease: 'Sine.easeOut',
+            delay: 1000,
+        });
         
         const startText = this.add.text(400, 450, "Press Enter to start", {
             fontSize: '24px',
@@ -43,10 +55,20 @@ export class Intro extends Scene {
             strokeThickness: 3,
         });
 
+        this.tweens.add({
+            targets: startText,
+            alpha: { from: 0, to: 1 },
+            duration: 1000,
+            ease: 'Sine.easeInOut',
+            yoyo: true,
+            repeat: -1
+        });
+
         startText.setOrigin(0.5);
 
         this.input.keyboard.on('keydown-ENTER', () => {
             this.scene.start('Game');
+            pressTween.stop();
         });
     }
 
