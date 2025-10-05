@@ -1,4 +1,5 @@
 import { Game as MainGame } from './scenes/Game';
+import {Intro } from './scenes/Intro';
 import { AUTO, Scale,Game, Physics } from 'phaser';
 
 // Find out more information about the Game Config at:
@@ -16,13 +17,13 @@ const config = {
     },
     parent: 'game-container',
    
-    backgroundColor: '#028af8',
+    backgroundColor: '#735e82',
     scale: {
         mode: Scale.FIT,
         autoCenter: Scale.CENTER_BOTH
     },
     scene: [
-        MainGame
+        Intro, MainGame
     ]
 };
 
