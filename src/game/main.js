@@ -1,5 +1,6 @@
 import { Game as MainGame } from './scenes/Game';
 import {Intro } from './scenes/Intro';
+import {IntroCutscene } from './scenes/IntroCutscene';
 import { AUTO, Scale,Game, Physics } from 'phaser';
 
 // Find out more information about the Game Config at:
@@ -23,7 +24,7 @@ const config = {
         autoCenter: Scale.CENTER_BOTH
     },
     scene: [
-        Intro, MainGame
+        Intro, IntroCutscene, MainGame
     ]
 };
 

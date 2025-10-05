@@ -67,8 +67,9 @@ export class Intro extends Scene {
         startText.setOrigin(0.5);
 
         this.input.keyboard.on('keydown-ENTER', () => {
-            this.scene.start('Game');
-            pressTween.stop();
+           
+            this.scene.start('IntroCutscene');
+            
         });
     }
 
