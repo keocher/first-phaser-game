@@ -3,8 +3,8 @@
 Finn's Takeaway is a short Phaser 3 platformer built with Vite. Step into Finn's kitchen, survive Chipper Jesus' initiation test, and flip enough burgers to hit the €500 goal—just make sure the moldy ones never hit the floor.
 
 ![Finn's Takeaway screenshot](screenshot1.png)
-(screenshot2.png)
-(screenshot3.png)
+![Cutscene Screenshot](screenshot2.png)
+![Gameplay Screenshot](screenshot3.png)
 
 ## Gameplay Overview
 - **Intro Screen:** Animated title card and prompt to begin.
