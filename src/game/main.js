@@ -24,7 +24,8 @@ const config = {
         autoCenter: Scale.CENTER_BOTH
     },
     scene: [
-        Intro, IntroCutscene, MainGame
+        Intro, 
+        IntroCutscene, MainGame
     ]
 };
 
